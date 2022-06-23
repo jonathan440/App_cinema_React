@@ -5,6 +5,7 @@ const Card = ({ movie }) => {
     const dateFormater = (date) => {
         let [yy, mm, dd] = date.split("-");
         return [dd + "/ ", mm + "/ ", yy];
+        //return [dd, mm, yy].join("/");
     };
 
     // permet de trouver le genre du film dans l'api
@@ -78,20 +79,29 @@ const Card = ({ movie }) => {
 
     // fonction d'ajout aux coup de coeur
     const addStorage = () => {
-        let storedData = window.localStorage.movies ? window.localStorage.movies.split(",") : [];
+        let storedData = window.localStorage.movies ?
+            window.localStorage.movies.split(",") :
+            [];
+
         if (!storedData.includes(movie.id.toString())) {
             storedData.push(movie.id);
             window.localStorage.movies = storedData;
         }
+    };
 
+    const deleteStorage = () => {
+        let storedData = window.localStorage.movies.split(",");
 
-    }
+        let newData = storedData.filter((id) => id !== movie.id);
+        window.localStorage.movies = newData;
+    };
 
 
     return (
         <div className="card">
             <img src={movie.poster_path ?
                 "https://image.tmdb.org/t/p/w500" + movie.poster_path : "./img/poster.jpg"} alt="affiche film" />
+
             <h2> {movie.title}</h2>
 
             {movie.release_date ? (
@@ -112,9 +122,20 @@ const Card = ({ movie }) => {
             {movie.overview ? <h3>Synopsis</h3> : ""}
             <p>{movie.overview}</p>
 
-            <div className="btn" onClick={() => addStorage()}>
-                Ajouter au coup de coeur</div>
+            {movie.genre_ids ? (
+
+                <div className="btn" onClick={() => addStorage()}>
+                    Ajouter au coup de coeur
+                </div>
+            ) : (
+                <div className="btn" onClick={() => {
+                    deleteStorage();
+                    window.location.reload();
+                }}>
+                    Supprimer de la liste</div>
+            )}
         </div>
+
     );
 };
 
